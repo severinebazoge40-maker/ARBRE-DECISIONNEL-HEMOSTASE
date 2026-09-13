@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Scénario d’embranchement - Hémostase pendant le soin</title>
+  <style>
+    :root{--navy:#08283c;--blue:#075985;--cyan:#0891b2;--pale:#e0f2fe;--green:#18794e;--green-bg:#dcfce7;--red:#b42318;--red-bg:#fee4e2;--ink:#17202a;--muted:#52606d;--line:#cbd5e1;--white:#fff;--shadow:0 14px 38px rgba(15,23,42,.14)}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:radial-gradient(circle at 12% 5%,#cbeeff 0,transparent 28rem),linear-gradient(145deg,#f8fafc,#edf5f8)}button{font:inherit}.app{width:min(980px,calc(100% - 28px));margin:auto;padding:26px 0 42px}header{margin-bottom:18px}h1{margin:0 0 8px;color:var(--navy);font-size:clamp(1.7rem,4vw,2.6rem)}.subtitle{margin:0;color:var(--muted);line-height:1.5}
+    .progress{display:grid;grid-template-columns:1fr auto;align-items:center;gap:16px;padding:14px 16px;margin-bottom:18px;border:1px solid #b6d4e4;border-radius:14px;background:rgba(255,255,255,.92);box-shadow:var(--shadow)}.track{height:10px;border-radius:99px;background:#e2e8f0;overflow:hidden}.fill{height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,var(--blue),#22d3ee);transition:width .3s}.count{color:var(--muted);font-weight:800;white-space:nowrap}
+    .case{overflow:hidden;border:1px solid #b6d4e4;border-radius:18px;background:#fff;box-shadow:var(--shadow)}.case-head{padding:15px 20px;color:#fff;background:linear-gradient(115deg,var(--navy),var(--blue))}.case-head strong{display:block;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:#a5f3fc}.case-head span{display:block;margin-top:5px;font-size:1.05rem;line-height:1.45}.content{padding:clamp(18px,4vw,32px)}h2{margin:0 0 12px;color:var(--navy);font-size:clamp(1.25rem,3vw,1.65rem)}.context{padding:15px;margin:0 0 20px;border-left:5px solid var(--cyan);border-radius:9px;background:var(--pale);line-height:1.55}.choices{display:grid;gap:11px}.choice{width:100%;padding:14px 16px;border:2px solid #a8c9dc;border-radius:12px;color:var(--navy);background:#f8fcfe;font-weight:730;line-height:1.4;text-align:left;cursor:pointer}.choice:hover,.choice:focus-visible{border-color:var(--cyan);background:#ecfeff;outline:none;transform:translateY(-1px)}
+    .feedback{display:none;padding:14px 16px;margin-top:18px;border-left:5px solid;border-radius:10px;line-height:1.5}.feedback.show{display:block}.feedback.good{border-color:var(--green);color:#14532d;background:var(--green-bg)}.feedback.bad{border-color:var(--red);color:#7a271a;background:var(--red-bg)}.continue{display:none;margin-top:13px;padding:11px 18px;border:0;border-radius:9px;color:#fff;background:var(--blue);font-weight:800;cursor:pointer}.continue.show{display:inline-block}
+    .explore{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.route{padding:15px;border:2px solid #b6d4e4;border-radius:12px;background:#f8fcfe;text-align:left;cursor:pointer}.route strong{display:block;color:var(--navy)}.route span{display:block;margin-top:5px;color:var(--muted);font-size:.9rem;line-height:1.35}.route.done{border-color:#4ade80;background:var(--green-bg)}.route.done strong{color:#14532d}.route:hover,.route:focus-visible{border-color:var(--cyan);outline:none}.summary{display:grid;gap:8px;padding:16px;margin:18px 0;border-radius:12px;background:#f1f5f9}.summary p{margin:0;line-height:1.5}.finish-actions{display:flex;flex-wrap:wrap;gap:10px}.action{padding:11px 16px;border:2px solid var(--blue);border-radius:9px;color:#fff;background:var(--blue);font-weight:800;cursor:pointer}.action.secondary{color:var(--blue);background:#fff}footer{margin-top:20px;color:var(--muted);font-size:.84rem;text-align:center}
+    @media(max-width:620px){.app{width:calc(100% - 18px);padding-top:16px}.progress{grid-template-columns:1fr}.explore{grid-template-columns:1fr}.case-head,.content{padding:16px}.choice{padding:13px}.fill{transition:none}}
+  </style>
+</head>
+<body>
+<main class="app">
+  <header><h1>Hémostase pendant le soin</h1><p class="subtitle">Un scénario à embranchements pour choisir et appliquer une conduite adaptée.</p></header>
+  <section class="progress"><div class="track" aria-label="Progression"><div id="fill" class="fill"></div></div><div id="count" class="count">Parcours explorés : 0 / 5</div></section>
+  <article class="case"><div class="case-head"><strong id="routeLabel">Situation clinique</strong><span id="constraint">Une suffusion mineure apparaît au niveau du bord interne du gros orteil pendant le soin.</span></div><div id="content" class="content"></div></article>
+  <footer>Activité construite à partir du cours sur l’hémostase pendant le soin et des consignes complémentaires fournies.</footer>
+</main>
+<script>
+  const routes={
+    first:{label:"Parcours 1",title:"La première compression suffit",description:"L’hémostase est obtenue après une minute de compression."},
+    peroxide:{label:"Parcours 2",title:"L’eau oxygénée est nécessaire",description:"La première compression ne suffit pas, mais la seconde permet l’hémostase."},
+    coalgan:{label:"Parcours 3",title:"Hémostase chimique avec Coalgan®",description:"Les deux tentatives mécaniques ne suffisent pas."},
+    topic:{label:"Parcours 4",title:"Hémostase chimique avec Bloxang® Topic",description:"Les deux tentatives mécaniques ne suffisent pas."},
+    sponge:{label:"Parcours 5",title:"Hémostase chimique avec Bloxang® Éponge",description:"Les deux tentatives mécaniques ne suffisent pas."}
+  };
+  let route="first",completed=new Set(),nextAction=null;
+  const content=document.getElementById("content"),feedback=document.createElement("div");feedback.className="feedback";
+  function updateProgress(){document.getElementById("count").textContent=`Parcours explorés : ${completed.size} / 5`;document.getElementById("fill").style.width=`${completed.size*20}%`}
+  function shuffleChoices(list){const copy=[...list];for(let i=copy.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[copy[i],copy[j]]=[copy[j],copy[i]]}return copy}
+  function screen({title,context,choices}){content.innerHTML=`<h2>${title}</h2>${context?`<p class="context">${context}</p>`:""}<div class="choices"></div>`;const box=content.querySelector(".choices");shuffleChoices(choices).forEach(c=>{const b=document.createElement("button");b.type="button";b.className="choice";b.textContent=c.text;b.addEventListener("click",()=>answer(c));box.appendChild(b)});feedback.className="feedback";feedback.innerHTML="";content.appendChild(feedback);window.scrollTo({top:0,behavior:"smooth"})}
+  function answer(c){feedback.className=`feedback show ${c.correct?"good":"bad"}`;feedback.innerHTML=`<strong>${c.correct?"Bonne décision.":"À revoir."}</strong> ${c.feedback}`;content.querySelectorAll(".continue").forEach(x=>x.remove());if(c.correct){content.querySelectorAll(".choice").forEach(x=>x.disabled=true);const b=document.createElement("button");b.type="button";b.className="continue show";b.textContent="Continuer";b.addEventListener("click",c.next);feedback.after(b)}}
+  const wrongFirst={text:"Utiliser immédiatement Coalgan® ou Bloxang®.",correct:false,feedback:"Les produits hémostatiques s’emploient lorsque l’hémostase mécanique n’a pas permis d’arrêter le saignement."};
+  function start(r=route){route=r;document.getElementById("routeLabel").textContent=routes[r].label;document.getElementById("constraint").textContent=`Une suffusion mineure apparaît au niveau du bord interne du gros orteil. ${routes[r].description}`;firstChoice()}
+  function firstChoice(){screen({title:"Que dois-je faire en première intention ?",context:"La suffusion est mineure.",choices:[
+    {text:"Prendre une compresse propre et réaliser une hémostase mécanique.",correct:true,feedback:"L’hémostase mécanique constitue la prise en charge de première intention.",next:mechanical},
+    {text:"Prendre immédiatement une compresse imbibée d’eau oxygénée.",correct:false,feedback:"L’eau oxygénée intervient si la première compression avec une compresse propre n’est pas convaincante."},wrongFirst]})}
+  function mechanical(){screen({title:"Comment réaliser cette hémostase mécanique ?",choices:[
+    {text:"Comprimer la blessure avec la compresse propre, relever la jambe ou le pied et attendre une minute.",correct:true,feedback:"Ces actions respectent les étapes de l’hémostase mécanique.",next:afterFirst},
+    {text:"Relever la jambe ou le pied, attendre une minute, puis réaliser la compression.",correct:false,feedback:"La compression doit être réalisée avant l’attente d’une minute."},
+    {text:"Comprimer puis utiliser immédiatement Coalgan®.",correct:false,feedback:"Il faut relever la jambe ou le pied et attendre une minute avant d’évaluer l’efficacité."}]})}
+  function afterFirst(){if(route==="first")aftercare("La première compression a permis d’obtenir l’hémostase.");else peroxideChoice()}
+  function peroxideChoice(){screen({title:"La première compression n’est pas convaincante. Que faire ?",context:"Après une minute, la suffusion persiste.",choices:[
+    {text:"Prendre une autre compresse propre et l’imbiber d’eau oxygénée.",correct:true,feedback:"Cette nouvelle compression constitue l’étape suivante de l’hémostase mécanique.",next:peroxideProcedure},
+    {text:"Conserver la première compresse et utiliser immédiatement Coalgan®.",correct:false,feedback:"Il faut d’abord réaliser une nouvelle compression avec une compresse propre imbibée d’eau oxygénée."},wrongFirst]})}
+  function peroxideProcedure(){screen({title:"Que faire avec la compresse imbibée d’eau oxygénée ?",choices:[
+    {text:"Comprimer la blessure, relever la jambe ou le pied et attendre une minute.",correct:true,feedback:"Vous pouvez maintenant évaluer cette seconde compression.",next:afterPeroxide},
+    {text:"Poser la compresse puis utiliser immédiatement un produit hémostatique.",correct:false,feedback:"La compresse imbibée doit servir à comprimer. Il faut ensuite relever la jambe ou le pied et attendre une minute."}]})}
+  function afterPeroxide(){if(route==="peroxide")aftercare("La compression avec l’eau oxygénée a permis d’obtenir l’hémostase.");else chemicalChoice()}
+  function chemicalChoice(){screen({title:"L’hémostase mécanique ne suffit pas. Que faire ?",context:"La suffusion persiste malgré les deux tentatives d’hémostase mécanique.",choices:[
+    {text:"Employer le produit hémostatique prévu dans ce parcours.",correct:true,feedback:"Lorsque l’hémostase mécanique n’a pas suffi, l’hémostase chimique peut être employée.",next:productProtocol},
+    {text:"Reprendre uniquement une compresse propre sans produit hémostatique.",correct:false,feedback:"Les étapes prévues de l’hémostase mécanique ont déjà été réalisées sans succès."}]})}
+  function productProtocol(){if(route==="coalgan")coalgan();else if(route==="topic")topic();else sponge()}
+  function coalgan(){screen({title:"Comment utiliser Coalgan® ?",choices:[
+    {text:"Prendre la ouate Coalgan®, comprimer plusieurs minutes et la laisser en place pendant le soin sous un pansement.",correct:true,feedback:"Coalgan® est une fibre d’alginate de calcium. Après le soin, il reste sous un pansement pendant 24 heures maximum.",next:coalganRemoval},
+    {text:"Poser la ouate sans compression puis la retirer immédiatement.",correct:false,feedback:"Coalgan® doit être utilisé en compression et rester en place sous un pansement."}]})}
+  function coalganRemoval(){screen({title:"Quelle consigne donner pour le retrait ?",choices:[
+    {text:"Mouiller le Coalgan® afin de le retirer sans arracher le caillot.",correct:true,feedback:"Une ordonnance est nécessaire pour la suite des soins et la prise en charge avec un protocole de pansement.",next:finish},
+    {text:"Retirer le Coalgan® sans le mouiller.",correct:false,feedback:"Le document demande de mouiller Coalgan® pour ne pas arracher le caillot."}]})}
+  function topic(){screen({title:"Comment utiliser Bloxang® Topic ?",choices:[
+    {text:"Mettre la pommade sur une compresse, comprimer la plaie et laisser en place sous un pansement.",correct:true,feedback:"Après le soin, un pansement propre est remis. Bloxang® Topic reste en place jusqu’à 24 heures. Une ordonnance est nécessaire pour la suite des soins.",next:finish},
+    {text:"Appliquer une éponge en exerçant une pression et la laisser deux ou trois jours.",correct:false,feedback:"Cette modalité correspond à Bloxang® Éponge, pas à Bloxang® Topic."}]})}
+  function sponge(){screen({title:"Comment utiliser Bloxang® Éponge ?",choices:[
+    {text:"Appliquer l’éponge en exerçant une pression, puis la laisser en place sous un pansement.",correct:true,feedback:"Après le soin, un pansement propre est remis. Bloxang® Éponge peut rester en place deux ou trois jours. Une ordonnance est nécessaire pour la suite des soins.",next:finish},
+    {text:"Mettre une pommade sur une compresse et la laisser jusqu’à 24 heures.",correct:false,feedback:"Cette modalité correspond à Bloxang® Topic, pas à Bloxang® Éponge."}]})}
+  function aftercare(context){screen({title:"Que faire à la fin du soin ?",context,choices:[
+    {text:"Changer le pansement, appliquer l’antiseptique Hexomédine® gel et réaliser l’ordonnance nécessaire.",correct:true,feedback:"La prise en charge de fin de soin est complète.",next:finish},
+    {text:"Conserver le même pansement et terminer la prise en charge.",correct:false,feedback:"Le pansement doit être changé à la fin du soin."},
+    {text:"Utiliser un produit hémostatique malgré l’arrêt du saignement.",correct:false,feedback:"L’hémostase mécanique a été suffisante dans cette situation."}]})}
+  function finish(){completed.add(route);updateProgress();const prescription=["coalgan","topic","sponge"].includes(route)?"<p><strong>Une ordonnance est nécessaire pour la suite des soins.</strong></p>":"";content.innerHTML=`<h2>Parcours terminé</h2><div class="summary"><p><strong>${routes[route].title}</strong></p><p>Vous avez suivi la conduite prévue pour cette contrainte.</p>${prescription}</div><h2>Explorer une autre contrainte</h2><div class="explore"></div>`;const box=content.querySelector(".explore");Object.entries(routes).forEach(([id,r])=>{const b=document.createElement("button");b.type="button";b.className=`route ${completed.has(id)?"done":""}`;b.innerHTML=`<strong>${completed.has(id)?"✓ ":""}${r.title}</strong><span>${r.description}</span>`;b.addEventListener("click",()=>start(id));box.appendChild(b)});if(completed.size===5){const p=document.createElement("p");p.className="context";p.textContent="Vous avez exploré les cinq parcours de l’activité.";content.prepend(p)}}
+  updateProgress();start("first");
+</script>
+</body></html>
